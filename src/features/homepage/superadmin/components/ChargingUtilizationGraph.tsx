@@ -50,34 +50,34 @@ export const options = {
   },
 };
 const labels = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
+  "Sun - 02/26",
+  "Mon - 02/27",
+  "Tues - 02/28"
+ 
 ];
 
 export const data = {
   labels,
   datasets: [
     {
-      label: "Dataset 1",
-      data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
+      label: "Utilization Revenue",
+      data: labels.map(() => faker.number.int({ min: 0, max: 10 })),
+      //data: labels.map(() => 5),
       backgroundColor: "#1A82EC",
     },
   ],
 };
+
+let graphTitle =  data.datasets[0].data ? data.datasets[0].data.reduce((acc, currVal) => {
+  return acc + currVal;
+}, 0) : 0;
 
 const ChargingUtilizationGraph = () => {
   return (
     <Card alignItems="center" h="30rem" p="4rem" pb="8rem">
       <Flex w="full" justifyContent="space-between">
         <Text fontWeight="bold" fontSize="1.5rem">
-          $3,278
+          {`$ ${graphTitle}`}
         </Text>
       </Flex>
       <Text
