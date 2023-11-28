@@ -8,18 +8,19 @@ interface StatusBadgeProps {
 
 const StatusBadge = ({ status, text, ...rest }: StatusBadgeProps) => {
   const badgeStyles: SystemStyleObject = {
-    py: "0.5rem",
-    px: "0.625rem",
+    // py: "8px",
+    // px: "10px",
     borderRadius: "4px",
     textTransform: "capitalize",
-    fontSize: "0.75rem",
+    
     fontWeight: 500,
+    
   };
 
   switch (status?.toLowerCase()) {
     case "connected":
       return (
-        <Badge sx={badgeStyles} colorScheme="green" {...rest}>
+        <Badge sx={badgeStyles} colorScheme="green" fontSize="0.75rem" {...rest}>
           {text.toLowerCase()}
         </Badge>
       );

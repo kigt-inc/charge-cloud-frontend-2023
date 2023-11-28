@@ -9,6 +9,7 @@ import {
   Input,
   Button,
   Container,
+  Alert,
 } from "@chakra-ui/react";
 
 import DashboardLayout from "@/components/Layout/DashboardLayout";
@@ -19,6 +20,7 @@ const EMAIL_VALIDATION_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
 const Account = () => {
   const user = useAppSelector((state) => state.user);
+  const [showAlert, setShowAlert] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [accountForm, setAccountForm] = useState({
     name: user?.first_name,
@@ -88,6 +90,7 @@ const Account = () => {
           Account Settings
         </Text>
         <Text color="GrayText">Update your account settings here</Text>
+
         <Card p="2rem" mt="2rem">
           <FormControl
             label="name"
@@ -135,6 +138,11 @@ const Account = () => {
             Save
           </Button>
         </Card>
+        {showAlert && (
+          <Alert status="success" variant="left-accent" mt="2rem">
+            Changes saved.
+          </Alert>
+        )}
       </Container>
     </DashboardLayout>
   );
