@@ -1,3 +1,5 @@
+import * as xlsx from "xlsx";
+
 interface resultType {
   labels: string[];
   data: number[];
@@ -107,4 +109,37 @@ export function processPowerFlow(data: any) {
   }
   result.total = Math.trunc(result.total);
   return result;
+}
+
+export async function loadChargerDataFromExcelSheet() {
+  let file = await getFileFromUrl("/rancho_chargers.xlsx", "rancho_chargers");
+  let res = {};
+  const reader = new FileReader();
+  reader.readAsBinaryString(file);
+  reader.onload = (e: any) => {
+    let res = {};
+    const data = e.target.result;
+    const wb = xlsx.read(data, { type: "binary" });
+    const ws1 = wb.Sheets[wb.SheetNames[0]];
+    const ws2 = wb.Sheets[wb.SheetNames[1]];
+
+    const ws1Data = xlsx.utils.sheet_to_json(ws1);
+    const ws2Data = xlsx.utils.sheet_to_json(ws2);
+    let chargerData = ws1Data.concat(ws2Data);
+    let res2 = processChargingUtilizationRevenue(chargerData);
+    res = { ...res2 };
+
+    // let newLabels = res.labels;
+    // let newGraphData = {
+    //   labels: newLabels,
+    //   datasets: [
+    //     { label: "Dataset 1", data: res.data, backgroundColor: "#1a82ec" },
+    //   ],
+    // };
+
+    // setGraphData({ ...newGraphData });
+    // setTotalRevenue(res.total);
+    return;
+  };
+  return res;
 }

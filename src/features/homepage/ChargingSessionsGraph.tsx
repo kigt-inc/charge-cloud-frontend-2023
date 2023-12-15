@@ -102,8 +102,12 @@ const ChargingSessionsGraph = () => {
       reader.onload = (e: any) => {
         const data = e.target.result;
         const wb = xlsx.read(data, { type: "binary" });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const chargerData = xlsx.utils.sheet_to_json(ws);
+        const ws1 = wb.Sheets[wb.SheetNames[0]];
+        const ws2 = wb.Sheets[wb.SheetNames[1]];
+
+        const ws1Data = xlsx.utils.sheet_to_json(ws1);
+        const ws2Data = xlsx.utils.sheet_to_json(ws2);
+        let chargerData = ws1Data.concat(ws2Data);
 
         let res = processTotalChargingSessionsData(chargerData);
         let newLabels = res.labels;

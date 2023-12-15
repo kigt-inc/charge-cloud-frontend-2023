@@ -17,9 +17,10 @@ import { faker } from "@faker-js/faker";
 import DashboardLayout from "@/components/Layout/DashboardLayout";
 import withAuth from "@/components/Auth/WithAuth";
 import StatusBadge from "@/components/Elements/StatusBadge";
+import { useEffect } from "react";
 
 const Terminals = () => {
-  const {colorMode} = useColorMode();
+  const { colorMode } = useColorMode();
   const generateFakeData = () => {
     let data = [];
     for (let i = 0; i < 10; i++) {
@@ -35,9 +36,29 @@ const Terminals = () => {
     }
     return data;
   };
-  const data = generateFakeData();
-  
-//blackAlpha
+  const data = [
+    {
+      name: "Rancho Charger 1",
+      serialNumber: 1640083690,
+      kiosk: "Rancho Charger 1",
+      model: "IM30",
+      merchant: "KIGT",
+      createdAt: faker.date.recent().toLocaleString(),
+      status: "connected",
+    },
+    {
+      name: "Rancho Charger 2",
+      serialNumber: 1640083657,
+      kiosk: "Rancho Charger 2",
+      model: "IM30",
+      merchant: "KIGT",
+      createdAt: faker.date.recent().toLocaleString(),
+      status: "connected",
+    },
+  ];
+
+  useEffect(() => {}, []);
+
   return (
     <DashboardLayout>
       <Container maxWidth="6xl" py="2rem">
@@ -50,8 +71,16 @@ const Terminals = () => {
         >
           Terminal Management
         </Text>
-        <TableContainer maxHeight="40rem" overflowY="scroll" bgColor={colorMode === 'dark' ? '#2d3748' : 'white'}>
-          <Table size="lg" variant="simple" colorScheme={colorMode === 'dark' ? 'blackAlpha' : 'whiteAlpha'}>
+        <TableContainer
+          maxHeight="40rem"
+          overflowY="scroll"
+          bgColor={colorMode === "dark" ? "#2d3748" : "white"}
+        >
+          <Table
+            size="lg"
+            variant="simple"
+            colorScheme={colorMode === "dark" ? "blackAlpha" : "whiteAlpha"}
+          >
             <Thead>
               <Tr>
                 <Th>Name</Th>
@@ -68,7 +97,7 @@ const Terminals = () => {
               {data.map((entry) => (
                 <Tr
                   // _hover={{ cursor: "pointer", bgColor: "#F6F7F7" }}
-                  _hover={{ cursor: "pointer"}}
+                  _hover={{ cursor: "pointer" }}
                   key={entry.serialNumber}
                 >
                   <Td>{entry.name}</Td>
