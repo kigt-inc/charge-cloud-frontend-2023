@@ -27,7 +27,7 @@ export async function getFileFromUrl(url: string, name: string) {
   });
 }
 
-export function processTotalChargingSessionsData(data) {
+export function processTotalChargingSessionsData(data: any) {
   let result: resultType = {
     labels: [],
     data: [],
@@ -53,7 +53,7 @@ export function processTotalChargingSessionsData(data) {
   return result;
 }
 
-export function processChargingUtilizationRevenue(data) {
+export function processChargingUtilizationRevenue(data: any) {
   let result: resultType = {
     labels: [],
     data: [],
@@ -82,7 +82,7 @@ export function processChargingUtilizationRevenue(data) {
   return result;
 }
 
-export function processPowerFlow(data) {
+export function processPowerFlow(data: any) {
   let result: resultType = {
     labels: [],
     data: [],

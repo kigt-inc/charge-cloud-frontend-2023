@@ -11,7 +11,7 @@ const SuperAdminHome = () => {
       <Container maxW="6xl">
         <Flex flexDir="column" gap={4} p="1.5rem">
           <ChargingUtilizationGraph />
-          <PowerFlowGraph labels={undefined} datasets={undefined} />
+          <PowerFlowGraph />
           <ChargingSessionsGraph />
         </Flex>
       </Container>

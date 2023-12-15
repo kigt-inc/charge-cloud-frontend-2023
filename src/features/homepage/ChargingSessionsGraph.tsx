@@ -99,7 +99,7 @@ const ChargingSessionsGraph = () => {
       );
       const reader = new FileReader();
       reader.readAsBinaryString(file);
-      reader.onload = (e) => {
+      reader.onload = (e: any) => {
         const data = e.target.result;
         const wb = xlsx.read(data, { type: "binary" });
         const ws = wb.Sheets[wb.SheetNames[0]];
