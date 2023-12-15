@@ -1,5 +1,4 @@
 import type { AppProps } from "next/app";
-import "@/styles/globals.css";
 import { Center, ChakraProvider, Spinner } from "@chakra-ui/react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";

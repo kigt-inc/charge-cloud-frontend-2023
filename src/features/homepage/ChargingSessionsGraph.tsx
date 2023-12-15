@@ -10,6 +10,9 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { faker } from "@faker-js/faker";
+import * as xlsx from "xlsx";
+import { useEffect, useState } from "react";
+import { getFileFromUrl, processTotalChargingSessionsData } from "@/utils";
 
 ChartJS.register(
   CategoryScale,
@@ -49,7 +52,7 @@ export const options = {
     },
   },
 };
-const labels = [
+let labels = [
   "January",
   "February",
   "March",
@@ -61,7 +64,7 @@ const labels = [
   "September",
 ];
 
-export const data = {
+export const graphData = {
   labels,
   datasets: [
     {
@@ -73,11 +76,56 @@ export const data = {
 };
 
 const ChargingSessionsGraph = () => {
+  const [graphData, setGraphData] = useState<{
+    labels: string[];
+    datasets: { label: string; data: number[]; backgroundColor: string }[];
+  }>({
+    labels,
+    datasets: [
+      {
+        label: "Dataset 1",
+        // data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
+        data: [],
+        backgroundColor: "#41C06D",
+      },
+    ],
+  });
+  const [totalChargingSessions, setTotalChargingSessions] = useState(0);
+  useEffect(() => {
+    const func = async () => {
+      let file = await getFileFromUrl(
+        "/rancho_chargers.xlsx",
+        "charger_90_data"
+      );
+      const reader = new FileReader();
+      reader.readAsBinaryString(file);
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const wb = xlsx.read(data, { type: "binary" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const chargerData = xlsx.utils.sheet_to_json(ws);
+
+        let res = processTotalChargingSessionsData(chargerData);
+        let newLabels = res.labels;
+        let newGraphData = {
+          labels: newLabels,
+          datasets: [
+            { label: "Dataset 1", data: res.data, backgroundColor: "#41C06D" },
+          ],
+        };
+
+        setGraphData({ ...newGraphData });
+        setTotalChargingSessions(res.total);
+      };
+    };
+    func();
+  }, []);
+
   return (
     <Card alignItems="center" h="30rem" p="4rem" pb="8rem">
       <Flex w="full" justifyContent="space-between">
         <Text fontWeight="bold" fontSize="1.5rem">
-          2,072
+          {`${totalChargingSessions}`}
         </Text>
       </Flex>
       <Text
@@ -91,9 +139,10 @@ const ChargingSessionsGraph = () => {
         Total Charging Sessions
       </Text>
       <Bar
+        redraw
         options={options}
-        data={data}
-        plugins={[customCanvasBackgroundColor]}
+        data={graphData}
+        // plugins={[customCanvasBackgroundColor]}
       />
     </Card>
   );

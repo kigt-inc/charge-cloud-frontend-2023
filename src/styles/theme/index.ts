@@ -2,11 +2,17 @@
 
 // export default extendTheme();
 
-import { extendTheme } from "@chakra-ui/react";
+import { ThemeConfig, extendTheme } from "@chakra-ui/react";
 import "@fontsource-variable/inter";
+
+const config: ThemeConfig = {
+  initialColorMode: "light",
+  useSystemColorMode: false,
+};
 
 // 2. Call `extendTheme` and pass your custom values
 const theme = extendTheme({
+  config,
   fonts: {
     header: `'Inter Variable', sans-serif`,
     body: `'Inter Variable', sans-serif`,

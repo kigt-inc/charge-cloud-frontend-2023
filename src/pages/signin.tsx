@@ -42,14 +42,14 @@ export default function SplitScreen() {
       });
       dispatch(SET_USER({ ...res.data }));
       setSignInError(false);
-      console.log(res.data);
+      
       if (res.data.role === "superadmin") {
         router.push("/superadmin/home");
       } else if (res.data.role === "client") {
         router.push("/client/home");
       }
     } catch (error) {
-      console.log("error = ", error);
+     
       setSignInError(true);
     }
   };

@@ -12,6 +12,9 @@ import {
 import { Bar } from "react-chartjs-2";
 import { faker } from "@faker-js/faker";
 import { test } from "node:test";
+import { useEffect, useState } from "react";
+import { getFileFromUrl, processPowerFlow } from "@/utils";
+import * as xlsx from "xlsx";
 
 ChartJS.register(
   CategoryScale,
@@ -51,7 +54,7 @@ export const options: ChartOptions<"bar"> = {
     },
   },
 };
-const testLabels = [
+const labels = [
   "January",
   "February",
   "March",
@@ -71,28 +74,58 @@ type PowerFlowGraphProps = {
     | null;
 };
 
-const PowerFlowGraph = ({ labels, datasets }: PowerFlowGraphProps) => {
-  labels = labels ?? testLabels;
-  const data = {
+const PowerFlowGraph = () => {
+  const [graphData, setGraphData] = useState<{
+    labels: string[];
+    datasets: { label: string; data: number[]; backgroundColor: string }[];
+  }>({
     labels,
     datasets: [
       {
         label: "Dataset 1",
-        data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
-        backgroundColor: "#FFC702",
-      },
-      {
-        label: "Dataset 2",
-        data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
+        // data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
+        data: [],
         backgroundColor: "#E3E4E4",
       },
     ],
-  };
+  });
+  const [totalKwh, setTotalKwh] = useState(0);
+
+  useEffect(() => {
+    const func = async () => {
+      let file = await getFileFromUrl(
+        "/rancho_chargers.xlsx",
+        "charger_90_data"
+      );
+      const reader = new FileReader();
+      reader.readAsBinaryString(file);
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const wb = xlsx.read(data, { type: "binary" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const chargerData = xlsx.utils.sheet_to_json(ws);
+
+        let res = processPowerFlow(chargerData);
+        let newLabels = res.labels;
+        let newGraphData = {
+          labels: newLabels,
+          datasets: [
+            { label: "Dataset 1", data: res.data, backgroundColor: "#E3E4E4" },
+          ],
+        };
+
+        setGraphData({ ...newGraphData });
+        setTotalKwh(res.total);
+      };
+    };
+    func();
+  }, []);
+
   return (
     <Card alignItems="center" h="30rem" p="4rem" pb="8rem">
       <Flex w="full" justifyContent="space-between">
         <Text fontWeight="bold" fontSize="1.5rem">
-          4.627 kW
+          {`${totalKwh} Kwh`}
         </Text>
       </Flex>
       <Text
@@ -106,9 +139,10 @@ const PowerFlowGraph = ({ labels, datasets }: PowerFlowGraphProps) => {
         Power Flow
       </Text>
       <Bar
+        redraw
         options={options}
-        data={data}
-        plugins={[customCanvasBackgroundColor]}
+        data={graphData}
+        //plugins={[customCanvasBackgroundColor]}
       />
     </Card>
   );

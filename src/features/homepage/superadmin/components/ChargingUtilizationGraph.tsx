@@ -1,4 +1,4 @@
-import { Card, Text, Flex } from "@chakra-ui/react";
+import { Card, Text, Flex, useColorMode } from "@chakra-ui/react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,6 +10,13 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { faker } from "@faker-js/faker";
+import { useEffect, useRef, useState } from "react";
+import {
+  getFileFromUrl,
+  processChargingUtilizationRevenue,
+  processTotalChargingSessionsData,
+} from "@/utils";
+import * as xlsx from "xlsx";
 
 ChartJS.register(
   CategoryScale,
@@ -22,7 +29,7 @@ ChartJS.register(
 
 ChartJS.defaults.backgroundColor = "#000";
 
-const customCanvasBackgroundColor = {
+let customCanvasBackgroundColor = {
   id: "customCanvasBackgroundColor",
   beforeDatasetsDraw: (chart: any) => {
     const {
@@ -49,12 +56,7 @@ export const options = {
     },
   },
 };
-const labels = [
-  "Sun - 02/26",
-  "Mon - 02/27",
-  "Tues - 02/28"
- 
-];
+const labels = ["Sun - 02/26", "Mon - 02/27", "Tues - 02/28"];
 
 export const data = {
   labels,
@@ -68,16 +70,65 @@ export const data = {
   ],
 };
 
-let graphTitle =  data.datasets[0].data ? data.datasets[0].data.reduce((acc, currVal) => {
-  return acc + currVal;
-}, 0) : 0;
+let graphTitle = data.datasets[0].data
+  ? data.datasets[0].data.reduce((acc, currVal) => {
+      return acc + currVal;
+    }, 0)
+  : 0;
 
 const ChargingUtilizationGraph = () => {
+  const [graphData, setGraphData] = useState<{
+    labels: string[];
+    datasets: { label: string; data: number[]; backgroundColor: string }[];
+  }>({
+    labels,
+    datasets: [
+      {
+        label: "Dataset 1",
+        // data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
+        data: [],
+        backgroundColor: "#1a82ec",
+      },
+    ],
+  });
+  const [totalRevenue, setTotalRevenue] = useState(0);
+
+  useEffect(() => {
+    const func = async () => {
+      let file = await getFileFromUrl(
+        "/rancho_chargers.xlsx",
+        "charger_90_data"
+      );
+      const reader = new FileReader();
+      reader.readAsBinaryString(file);
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const wb = xlsx.read(data, { type: "binary" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const chargerData = xlsx.utils.sheet_to_json(ws);
+
+        let res = processChargingUtilizationRevenue(chargerData);
+
+        let newLabels = res.labels;
+        let newGraphData = {
+          labels: newLabels,
+          datasets: [
+            { label: "Dataset 1", data: res.data, backgroundColor: "#1a82ec" },
+          ],
+        };
+
+        setGraphData({ ...newGraphData });
+        setTotalRevenue(res.total);
+      };
+    };
+    func();
+  }, []);
+
   return (
     <Card alignItems="center" h="30rem" p="4rem" pb="8rem">
       <Flex w="full" justifyContent="space-between">
         <Text fontWeight="bold" fontSize="1.5rem">
-          {`$ ${graphTitle}`}
+          {`$ ${totalRevenue}`}
         </Text>
       </Flex>
       <Text
@@ -91,9 +142,10 @@ const ChargingUtilizationGraph = () => {
         Charging Utilization Revenue
       </Text>
       <Bar
+        redraw
         options={options}
-        data={data}
-        plugins={[customCanvasBackgroundColor]}
+        data={graphData}
+        //plugins={[customCanvasBackgroundColor]}
       />
     </Card>
   );

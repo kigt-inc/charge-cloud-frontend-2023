@@ -9,6 +9,7 @@ import {
   Td,
   Container,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
 
 import { faker } from "@faker-js/faker";
@@ -18,6 +19,7 @@ import withAuth from "@/components/Auth/WithAuth";
 import StatusBadge from "@/components/Elements/StatusBadge";
 
 const Terminals = () => {
+  const {colorMode} = useColorMode();
   const generateFakeData = () => {
     let data = [];
     for (let i = 0; i < 10; i++) {
@@ -34,7 +36,8 @@ const Terminals = () => {
     return data;
   };
   const data = generateFakeData();
-  console.log("data = ", data);
+  
+//blackAlpha
   return (
     <DashboardLayout>
       <Container maxWidth="6xl" py="2rem">
@@ -47,8 +50,8 @@ const Terminals = () => {
         >
           Terminal Management
         </Text>
-        <TableContainer maxHeight="40rem" overflowY="scroll" bgColor="white">
-          <Table size="lg" variant="simple">
+        <TableContainer maxHeight="40rem" overflowY="scroll" bgColor={colorMode === 'dark' ? '#2d3748' : 'white'}>
+          <Table size="lg" variant="simple" colorScheme={colorMode === 'dark' ? 'blackAlpha' : 'whiteAlpha'}>
             <Thead>
               <Tr>
                 <Th>Name</Th>
@@ -64,7 +67,8 @@ const Terminals = () => {
             <Tbody>
               {data.map((entry) => (
                 <Tr
-                  _hover={{ cursor: "pointer", bgColor: "#F6F7F7" }}
+                  // _hover={{ cursor: "pointer", bgColor: "#F6F7F7" }}
+                  _hover={{ cursor: "pointer"}}
                   key={entry.serialNumber}
                 >
                   <Td>{entry.name}</Td>
